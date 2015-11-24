@@ -122,6 +122,8 @@ class Zuora
 
   private function sendQueries()
   {
+    $this->logMessage("Sending queries.");
+
     $queries = array();
 
     foreach ($this->config['queries'] as $name => $query)
