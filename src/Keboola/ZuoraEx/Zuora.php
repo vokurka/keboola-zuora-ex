@@ -8,7 +8,7 @@ class Zuora
   private $mandatoryConfigColumns = array(
     'bucket', 
     'username', 
-    'password',
+    '#password',
     'start_date',
     'end_date',
     'queries',
@@ -57,7 +57,7 @@ class Zuora
           'Content-Type' => 'application/json',
         ), 
         'username' => $this->config['username'],
-        'password' => $this->config['password'],
+        'password' => $this->config['#password'],
     ));
 
     $this->api->register_decoder('json', 
@@ -172,7 +172,7 @@ class Zuora
     foreach ($status['batches'] as $b)
     {
       $username = str_replace('@', '%40', $this->config['username']);
-      $password = str_replace('@', '%40', $this->config['password']);
+      $password = str_replace('@', '%40', $this->config['#password']);
 
       if (!$remote = fopen("https://{$username}:{$password}@www.zuora.com/apps/api/file/{$b['fileId']}", 'r'))
       {

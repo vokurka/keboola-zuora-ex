@@ -9,7 +9,7 @@ Here is an example of configuration:
   "bucket": "in.c-ex-zuora-main",
 
   "username": "<your_username>",
-  "password": "<your_password>",
+  "#password": "<your_password>",
 
   "start_date": "-1 month",
   "end_date": "today",
