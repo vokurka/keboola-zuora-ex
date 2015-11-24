@@ -9,7 +9,6 @@ class Zuora
     'bucket', 
     'username', 
     'password',
-    'project',
     'start_date',
     'end_date',
     'queries',
@@ -30,7 +29,7 @@ class Zuora
       $this->config[$c] = $config[$c];
     }
 
-    foreach (array('date_from', 'date_to') as $dateId)
+    foreach (array('start_date', 'end_date') as $dateId)
     {
       $timestamp = strtotime($this->config[$dateId]);
 
@@ -52,12 +51,17 @@ class Zuora
 
     // API initialization
     $this->api = new RestClient(array(
-        'base_url' => "https://www.zuora.com/apps/api/", 
-        'format' => "json", 
-        'headers' => array('Accept' => 'application/json'), 
+        'base_url' => "https://www.zuora.com/apps", 
+        'headers' => array(
+          'Accept' => 'application/json',
+          'Content-Type' => 'application/json',
+        ), 
         'username' => $this->config['username'],
         'password' => $this->config['password'],
     ));
+
+    $this->api->register_decoder('json', 
+    create_function('$a', "return json_decode(\$a, TRUE);"));
   }
 
   private function logMessage($message)
@@ -72,7 +76,7 @@ class Zuora
 
     if (empty($result['id']))
     {
-      throw new Exception("Sending queries failed - maybe invalid format?");
+      throw new Exception("Sending queries failed - maybe invalid query? Message: ".$result['message']);
     }
 
     // Wait till its done
@@ -134,26 +138,25 @@ class Zuora
       );
     }
 
-    $result = $api->post("batch-query", array(
+    $jsonLoad = json_encode(array(
       "format" => "csv",
-      "version" => "1.2",
-      "name" : "reports",
+      "version" => "1.1",
+      "name" => "reports",
       "queries"  => $queries,
     ));
 
-    return $result;
+    $result = $this->api->post("/api/batch-query/", $jsonLoad);
+
+    return $result->decode_response();
   }
 
   private function getJobStatus($id)
   {
-    $result = $api->get("batch-query/jobs/".$id);
+    $result = $this->api->get("/api/batch-query/jobs/".$id);
 
-    if (isset($result['status']))
-    {
-      return $result['status'];
-    }
+    $result = $result->decode_response();
 
-    return FALSE;
+    return $result;
   }
 
   private function downloadFiles($status)
@@ -166,7 +169,10 @@ class Zuora
     // For every file open stream on remote server, open it directly in data out tables folder and strem copy
     foreach ($status['batches'] as $b)
     {
-      if (!$remote = fopen("https://www.zuora.com/apps/api/file/{$b['fileId']}", 'r'))
+      $username = str_replace('@', '%40', $this->config['username']);
+      $password = str_replace('@', '%40', $this->config['password']);
+
+      if (!$remote = fopen("https://{$username}:{$password}@www.zuora.com/apps/api/file/{$b['fileId']}", 'r'))
       {
         throw new Exception("Could not download ".$b['name']);
       }
