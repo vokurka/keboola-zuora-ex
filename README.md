@@ -4,7 +4,8 @@ To use Zuora AQuA Extractor you just need to create the component in your KBC pr
 
 Here is an example of configuration:
 
-`{
+```
+{
   "bucket": "in.c-ex-zuora-main",
 
   "username": "<your_username>",
@@ -17,7 +18,8 @@ Here is an example of configuration:
     "report1": "select AccountNumber from account where CreatedDate >= {start_date} and CreatedDate <= {end_date}",
     "report2": "select AccountNumber from account where CreatedDate >= {start_date} and CreatedDate <= {end_date}"
   }
-}`
+}
+```
 
 * bucket - destination bucket for downloaded data
 * username - username of account you are using to access Zuora
