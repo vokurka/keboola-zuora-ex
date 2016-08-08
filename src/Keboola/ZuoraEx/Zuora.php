@@ -76,6 +76,11 @@ class Zuora
 
     if (empty($result['id']))
     {
+      if (empty($result['message']))
+      {
+        $result['message'] = 'Malformed response from the server -- cannot parse the response.';
+      }
+
       throw new Exception("Sending queries failed - maybe invalid query? Message: ".$result['message']);
     }
 
