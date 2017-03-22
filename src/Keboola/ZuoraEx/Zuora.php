@@ -152,9 +152,23 @@ class Zuora
       "queries"  => $queries,
     ));
 
-    $result = $this->api->post("/api/batch-query/", $jsonLoad);
+    try
+    {
+      $result = $this->api->post("/api/batch-query/", $jsonLoad);
 
-    return $result->decode_response();
+      $decodedResult = $result->decode_response();
+    }
+    catch (Exception $e)
+    {
+      echo "There was an error sending the request.\n";
+      var_dump($e);
+      var_dump($jsonLoad);
+      var_dump($result);
+      var_dump($decodedResult);
+    }
+
+
+    return $decodedResult;
   }
 
   private function getJobStatus($id)
