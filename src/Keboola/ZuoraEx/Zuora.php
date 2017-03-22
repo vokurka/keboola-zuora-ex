@@ -161,10 +161,9 @@ class Zuora
     catch (Exception $e)
     {
       echo "There was an error sending the request.\n";
-      var_dump($e);
-      var_dump($jsonLoad);
-      var_dump($result);
-      var_dump($decodedResult);
+      print_r($jsonLoad);
+      print_r($result);
+      exit;
     }
 
 
